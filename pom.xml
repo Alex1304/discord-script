@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.alex1304</groupId>
+	<artifactId>discord-script</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+
+	<name>DiscordScript</name>
+	<url>https://github.com/Alex1304/discord-script</url>
+
+	<description>Configure your Discord server using a powerful, unique, declarative scripting language!</description>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Alex1304</name>
+			<email>mirandaa1304@gmail.com</email>
+		</developer>
+	</developers>
+
+	<properties>
+		<java.version>11</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<release>${java.version}</release>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.basedir}</outputDirectory>
+							<archive>
+								<manifest>
+									<mainClass>com.github.alex1304.discordscript.Main</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<appendAssemblyId>false</appendAssemblyId>
+							<finalName>discordscript</finalName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.discord4j</groupId>
+			<artifactId>discord4j-core</artifactId>
+			<version>3.0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.3.0-alpha4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.mail</groupId>
+					<artifactId>javax.mail-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.mail</groupId>
+					<artifactId>javax.mail</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+</project>
