@@ -30,7 +30,7 @@ public class Main {
 				.setEventScheduler(Schedulers.immediate())
 				.setInitialPresence(Presence.online(Activity.playing("Discord Hack Week 2019")))
 				.build();
-		var bot = new Bot(token, discordClient);
+		var bot = new Bot(discordClient);
 		bot.start().block();
 	}
 

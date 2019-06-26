@@ -9,21 +9,10 @@ import reactor.core.publisher.Mono;
 public class Bot {
 	//private static final Logger LOGGER = LoggerFactory.getLogger(Bot.class);
 	
-	private final String token;
 	private final DiscordClient discordClient;
 
-	public Bot(String token, DiscordClient discordClient) {
-		this.token = token;
+	public Bot(DiscordClient discordClient) {
 		this.discordClient = discordClient;
-	}
-
-	/**
-	 * Get the bot token.
-	 * 
-	 * @return the token
-	 */
-	public String getToken() {
-		return token;
 	}
 
 	/**
@@ -35,6 +24,11 @@ public class Bot {
 		return discordClient;
 	}
 
+	/**
+	 * Starts the bot.
+	 * 
+	 * @return a Mono that should be subscribed to in order to start the bot.
+	 */
 	public Mono<Void> start() {
 		return discordClient.login();
 	}
