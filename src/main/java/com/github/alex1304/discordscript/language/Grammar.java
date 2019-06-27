@@ -1,62 +1,66 @@
 package com.github.alex1304.discordscript.language;
 
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
+import reactor.util.annotation.Nullable;
+
+/**
+ * Automaton-based grammar resolver.
+ */
 public class Grammar {
 	
 	private State<?> currentState;
 	private State<?> loopBack;
+	private boolean isComplete;
 	
 	private Grammar(State<?> initialState) {
 		this.currentState = initialState;
 		this.loopBack = null;
+		this.isComplete = false;
 	}
 	
-	public boolean next(String rawToken) {
-		if (currentState == null) {
-			return false;
+	public boolean consumeNext(String token) {
+		if (isComplete) {
+			throw new IllegalStateException("Grammar already complete");
 		}
-		if (currentState.token.matches(rawToken) && currentState.checkAndResolve()) {
+		if (currentState != null && currentState.consume(token)) {
 			loopBack = currentState.loopBack;
 			currentState = currentState.next;
 			return true;
 		}
-		if (loopBack != null && loopBack.token.matches(rawToken) && loopBack.checkAndResolve()) {
-			loopBack = loopBack.loopBack;
+		if (loopBack != null && loopBack.consume(token)) {
 			currentState = loopBack.next;
+			loopBack = loopBack.loopBack;
 			return true;
 		}
+		isComplete = true;
 		return false;
 	}
 	
 	public boolean complete() {
+		if (isComplete) {
+			throw new IllegalStateException("Grammar already complete");
+		}
+		isComplete = true;
 		return currentState == null || currentState.isTerminal;
 	}
 	
 	private static class State<T> {
-		private final Token<T> token;
-		private final Predicate<T> cond;
+		private final GrammarElement<T> element;
 		private Consumer<T> onResolve;
 		private State<?> next;
 		private State<?> loopBack;
 		private boolean isTerminal;
-		State(Token<T> token, Predicate<T> cond, Consumer<T> onResolve, boolean isTerminal) {
-			this.token = token;
-			this.cond = cond;
-			this.onResolve = onResolve;
+		State(GrammarElement<T> element, Consumer<T> onResolve, boolean isTerminal) {
+			this.element = element;
+			this.onResolve = onResolve != null ? onResolve : x -> {};
 			this.isTerminal = isTerminal;
 		}
-		boolean checkAndResolve() {
-			T val = token.value();
-			if (cond.test(val)) {
+		boolean consume(String token) {
+			return element.value(token).map(val -> {
 				onResolve.accept(val);
 				return true;
-			}
-			return false;
-		}
-		void addActionOnResolve(Runnable action) {
-			onResolve = onResolve.andThen(__ -> action.run());
+			}).orElse(false);
 		}
 	}
 	
@@ -68,16 +72,8 @@ public class Grammar {
 		private State<?> tail;
 		private boolean optional;
 		
-		public <T> void append(Token<T> token, Consumer<T> onResolve) {
-			append(token, (Predicate<T>) x -> true, onResolve);
-		}
-		
-		public <T> void append(Token<T> token, T expectedValue, Consumer<T> onResolve) {
-			append(token, (Predicate<T>) x -> x.equals(expectedValue), onResolve);
-		}
-		
-		public <T> void append(Token<T> token, Predicate<T> valueCondition, Consumer<T> onResolve) {
-			var state = new State<>(token, valueCondition, onResolve, optional);
+		public <T> GrammarBuilder append(GrammarElement<T> element, @Nullable Consumer<T> onResolve) {
+			var state = new State<>(element, onResolve, optional);
 			if (head == null) {
 				head = state;
 				tail = state;
@@ -85,23 +81,34 @@ public class Grammar {
 				tail.next = state;
 				tail = state;
 			}
+			return this;
 		}
 		
-		public void optional() {
+		public <T> GrammarBuilder append(GrammarElement<T> element) {
+			return append(element, null);
+		}
+		
+		public GrammarBuilder optional() {
 			optional = true;
+			return this;
 		}
 		
-		public <T> void appendSubgrammar(GrammarBuilder subgrammar, boolean repeatable, Runnable onResolve) {
-			tail.next = subgrammar.head;
+		public <T> GrammarBuilder appendSubgrammar(GrammarBuilder subgrammar, boolean repeatable) {
 			if (repeatable) {
-				subgrammar.tail.loopBack = tail;
+				subgrammar.tail.loopBack = subgrammar.head;
 			}
+			tail.next = subgrammar.head;
+			tail.next.isTerminal = optional;
 			tail = subgrammar.tail;
-			tail.addActionOnResolve(onResolve);
+			return this;
+		}
+		
+		public Grammar build() {
+			return new Grammar(head);
 		}
 	}
 	
-	public GrammarBuilder builder() {
+	public static GrammarBuilder builder() {
 		return new GrammarBuilder();
 	}
 }
