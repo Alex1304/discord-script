@@ -24,4 +24,11 @@ abstract class InputElement<T> implements GrammarElement<T> {
 	public Optional<T> value(String input) {
 		return Optional.of(input).map(parser).filter(valueCond);
 	}
+	
+	@Override
+	public String describeExpectedValue() {
+		return "<" + describeExpectedValue0() + ">";
+	}
+	
+	abstract String describeExpectedValue0();
 }

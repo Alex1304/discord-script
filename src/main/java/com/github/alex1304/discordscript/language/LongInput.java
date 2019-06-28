@@ -13,4 +13,9 @@ public class LongInput extends InputElement<Long> {
 	public LongInput(@Nullable Predicate<Long> valueCond) {
 		super(Long::parseLong, valueCond);
 	}
+
+	@Override
+	String describeExpectedValue0() {
+		return "long_number";
+	}
 }

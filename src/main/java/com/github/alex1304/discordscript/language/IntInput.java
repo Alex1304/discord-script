@@ -13,4 +13,9 @@ public class IntInput extends InputElement<Integer> {
 	public IntInput(@Nullable Predicate<Integer> valueCond) {
 		super(Integer::parseInt, valueCond);
 	}
+
+	@Override
+	String describeExpectedValue0() {
+		return "number";
+	}
 }

@@ -8,6 +8,13 @@ import reactor.core.publisher.Mono;
  * Represents an instruction in the Discord Script language.
  */
 public interface Instruction {
+	/**
+	 * Provides the grammar for this instruction. It is important that this method
+	 * returns a NEW instance of the Grammar object on each call
+	 * 
+	 * @return the grammar
+	 */
+	Grammar getGrammar();
 
 	/**
 	 * Executes the instruction.

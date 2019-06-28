@@ -1,5 +1,7 @@
 package com.github.alex1304.discordscript.language;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import reactor.util.annotation.Nullable;
@@ -9,11 +11,13 @@ import reactor.util.annotation.Nullable;
  */
 public class Grammar {
 	
+	private final State<?> initialState;
 	private State<?> currentState;
 	private State<?> loopBack;
 	private boolean isComplete;
 	
 	private Grammar(State<?> initialState) {
+		this.initialState = initialState;
 		this.currentState = initialState;
 		this.loopBack = null;
 		this.isComplete = false;
@@ -37,11 +41,52 @@ public class Grammar {
 		return false;
 	}
 	
+	/**
+	 * Marks this grammar as complete.
+	 * 
+	 * @return true if it was on a terminal state, false otherwise
+	 */
 	public boolean complete() {
 		if (isComplete) {
 			throw new IllegalStateException("Grammar already complete");
 		}
 		isComplete = true;
+		return isOnTerminalState();
+	}
+	
+	/**
+	 * Returns a new instance of this grammar that is reset to its initial state.
+	 * 
+	 * @return a new grammar identical to this one but reset to initial state.
+	 */
+	public Grammar freshInstance() {
+		return new Grammar(initialState);
+	}
+	
+	/**
+	 * Provides a list containing the descriptions of the next expected tokens.
+	 * 
+	 * @return a String list, one for each expected token
+	 */
+	public List<String> describeExpectedTokens() {
+		var expecteds = new ArrayList<String>();
+		if (currentState != null) {
+			expecteds.add(currentState.element.describeExpectedValue());
+		}
+		if (loopBack != null) {
+			expecteds.add(loopBack.element.describeExpectedValue());
+		}
+		return expecteds;
+	}
+	
+	/**
+	 * Checks if the current state of the grammar is terminal. It differs from
+	 * {@link #complete()} in that it doesn't mark this grammar as complete after
+	 * this is called.
+	 * 
+	 * @return true if the grammar is on a terminal state, false otherwise
+	 */
+	public boolean isOnTerminalState() {
 		return currentState == null || currentState.isTerminal;
 	}
 	

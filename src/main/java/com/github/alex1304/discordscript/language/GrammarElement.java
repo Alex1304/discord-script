@@ -16,4 +16,11 @@ public interface GrammarElement<T> {
 	 * @return an Optional with the recognized value, or empty if not recognized
 	 */
 	Optional<T> value(String input);
+	
+	/**
+	 * Provides a description for the expected value, used for documentation purposes.
+	 * 
+	 * @return a String describing the expected format of value
+	 */
+	String describeExpectedValue();
 }
