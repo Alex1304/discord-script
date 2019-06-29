@@ -1,4 +1,4 @@
-package com.github.alex1304.discordscript.language;
+package com.github.alex1304.discordscript.grammar;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,47 +7,68 @@ import org.junit.jupiter.api.Test;
 
 public class GrammarTest {
 	
-	private Grammar g1, g2, g3, g4;
+	private Grammar g1, g2, g3, g4, g5;
 
 	@BeforeEach
 	void setUp() throws Exception {
 		g1 = Grammar.builder()
-				.append(new Keyword("create"))
-				.append(new Keyword("text"))
-				.append(new Keyword("channel"))
-				.append(new StringInput("", v -> !v.startsWith("a")))
+				.add(new Keyword("create"))
+				.add(new Keyword("text"))
+				.add(new Keyword("channel"))
+				.add(new StringInput("", v -> !v.startsWith("a")))
 				.build();
 		g2 = Grammar.builder()
-				.append(new Keyword("create"))
-				.append(new Keyword("text"))
-				.append(new Keyword("channel"))
-				.append(new StringInput(""))
-				.optional()
-				.append(new Keyword("nsfw"))
+				.add(new Keyword("create"))
+				.add(new Keyword("text"))
+				.add(new Keyword("channel"))
+				.add(new StringInput(""))
+				.addOptions(Grammar.of(new Keyword("nsfw")))
 				.build();
 		g3 = Grammar.builder()
-				.append(new Keyword("create"))
-				.append(new Keyword("text"))
-				.append(new Keyword("channel"))
-				.append(new StringInput(""))
-				.optional()
-				.appendSubgrammar(Grammar.builder()
-						.append(new Keyword("with"))
-						.append(new Keyword("topic"))
-						.append(new StringInput("")), false)
+				.add(new Keyword("create"))
+				.add(new Keyword("text"))
+				.add(new Keyword("channel"))
+				.add(new StringInput(""))
+				.addOptions(Grammar.builder()
+						.add(new Keyword("with"))
+						.add(new Keyword("topic"))
+						.add(new StringInput(""))
+						.build())
 				.build();
 		g4 = Grammar.builder()
-				.append(new Keyword("edit"))
-				.append(new Keyword("permissions"))
-				.append(new Keyword("for"))
-				.append(new StringInput(""))
-				.append(new Keyword("default"))
-				.append(new StringInput(""))
-				.appendSubgrammar(Grammar.builder()
-						.append(new Keyword("in"))
-						.append(new StringInput(""))
-						.append(new Keyword("allow", "deny"))
-						.append(new StringInput("")), true)
+				.add(new Keyword("edit"))
+				.add(new Keyword("permissions"))
+				.add(new Keyword("for"))
+				.add(new StringInput(""))
+				.add(new Keyword("default"))
+				.add(new StringInput(""))
+				.addOptions(Grammar.builder()
+						.add(new Keyword("in"))
+						.add(new StringInput(""))
+						.add(new Keyword("allow", "deny"))
+						.add(new StringInput(""))
+						.build())
+				.build();
+		g5 = Grammar.builder()
+				.add(new Keyword("configure"))
+				.add(new Keyword("permissions", "perms"))
+				.add(new Keyword("for"))
+				.add(new StringInput("role name"))
+				.addOptions(
+						Grammar.builder()
+								.add(new Keyword("on"))
+								.add(new StringInput("channel name"))
+								.add(new Keyword("allow"))
+								.add(new StringInput("perm"))
+								.build(),
+						Grammar.builder()
+								.add(new Keyword("on"))
+								.add(new StringInput("channel name"))
+								.add(new Keyword("deny"))
+								.add(new StringInput("perm"))
+								.build())
+				.add(new Keyword("default"))
+				.addOptions(Grammar.of(new StringInput("perm")))
 				.build();
 	}
 
@@ -195,5 +216,19 @@ public class GrammarTest {
 		assertTrue(g4.consumeNext("in"), "repeat complete early, token 11");
 		assertTrue(g4.consumeNext("test2"), "repeat complete early, token 12");
 		assertFalse(g4.complete(), "repeat complete early, complete");
+	}
+	
+	@Test
+	void testG5() {
+		assertTrue(g5.consumeNext("configure"));
+		assertTrue(g5.consumeNext("permissions"));
+		assertTrue(g5.consumeNext("for"));
+		assertTrue(g5.consumeNext("test"));
+		assertTrue(g5.consumeNext("on"));
+		assertTrue(g5.consumeNext("test"));
+		assertTrue(g5.consumeNext("allow"));
+		assertTrue(g5.consumeNext("test"));
+		assertTrue(g5.consumeNext("default"));
+		assertTrue(g5.complete());
 	}
 }

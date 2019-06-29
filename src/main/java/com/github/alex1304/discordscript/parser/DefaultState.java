@@ -1,5 +1,10 @@
 package com.github.alex1304.discordscript.parser;
 
+import com.github.alex1304.discordscript.parser.Parser.ParseProcess;
+
+/**
+ * Default state indicating that the parser is parsing lines of code.
+ */
 public class DefaultState implements ParserState {
 	
 	private final StringBuilder buffer = new StringBuilder();
@@ -14,10 +19,7 @@ public class DefaultState implements ParserState {
 	}
 
 	@Override
-	public void read(Parser parser, int c) {
-		if (c == '\n') {
-			parser.incrementLineNumber();
-		}
+	public void read(ParseProcess parser, int c) {
 		if (escaping) {
 			buffer.appendCodePoint(c);
 			escaping = false;
@@ -58,7 +60,9 @@ public class DefaultState implements ParserState {
 	}
 
 	@Override
-	public void complete(Parser parser) {
-		parser.addToken(buffer.toString());
+	public void complete(ParseProcess parser) {
+		if (buffer.length() > 0) {
+			parser.addToken(buffer.toString());
+		}
 	}
 }

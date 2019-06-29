@@ -1,4 +1,4 @@
-package com.github.alex1304.discordscript.language;
+package com.github.alex1304.discordscript.grammar;
 
 import java.util.Optional;
 

@@ -1,0 +1,39 @@
+# Test file that configures a whole Discord server from scratch!
+
+create category info
+create text channel welcome category info
+create text channel rules category info
+create text channel announcements category info
+
+create category "text chats"
+create text channel general category "text chats"
+create text channel off-topic category "text chats"
+create text channel memes category "text chats"
+create text channel advertisements category "text chats"
+create text channel cute-pics category "text chats"
+create text channel nsfw category "text chats" nsfw
+create text channel bot-commands category "text chats"
+create text channel mod-chat category "text chats"
+
+create category "voice chats"
+create voice channel General category "voice chats"
+create voice channel Music category "voice chats" bitrate 96000
+create voice channel Gaming category "voice chats" userlimit 5
+create voice channel Mods category "voice chats"
+
+create role "Moderator" color "#00FF00"
+
+configure permissions for @everyone
+| on welcome deny send_messages manage_messages add_reactions
+| on rules deny send_messages manage_messages add_reactions
+| on announcements deny send_messages
+| on mod-chat deny view_channel
+| on Music deny speak
+| on Mods deny connect
+| default view_channel send_messages change_nickname create_instant_invite use_external_emojis read_message_history attach_files embed_links use_external_emojis connect speak use_vad
+
+configure permissions for Moderator
+| on announcements allow send_messages
+| on mod-chat allow view_channel
+| on Mods allow speak
+| default manage_messages priority_speaker kick_members ban_members mute_members deafen_members move_members manage_nicknames

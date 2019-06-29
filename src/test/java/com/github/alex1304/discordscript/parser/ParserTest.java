@@ -6,12 +6,12 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import com.github.alex1304.discordscript.Bot;
-import com.github.alex1304.discordscript.language.Grammar;
+import com.github.alex1304.discordscript.grammar.Grammar;
+import com.github.alex1304.discordscript.grammar.Keyword;
+import com.github.alex1304.discordscript.grammar.StringInput;
 import com.github.alex1304.discordscript.language.Instruction;
-import com.github.alex1304.discordscript.language.Keyword;
-import com.github.alex1304.discordscript.language.StringInput;
 
+import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
 
 public class ParserTest {
@@ -21,8 +21,8 @@ public class ParserTest {
 	@Test
 	void testParseLine() throws ScriptException {
 		var instrList = PARSER.parse("create text channel test\ncreate voice channel test");
-		assertTrue(instrList.get(0) instanceof ExampleInstruction1);
-		assertTrue(instrList.get(1) instanceof ExampleInstruction2);
+		assertTrue(instrList.get(0).getT2() instanceof ExampleInstruction1);
+		assertTrue(instrList.get(1).getT2() instanceof ExampleInstruction2);
 	}
 
 }
@@ -32,15 +32,15 @@ class ExampleInstruction1 implements Instruction {
 	@Override
 	public Grammar getGrammar() {
 		return Grammar.builder()
-				.append(new Keyword("create"))
-				.append(new Keyword("text"))
-				.append(new Keyword("channel"))
-				.append(new StringInput("channel_name"))
+				.add(new Keyword("create"))
+				.add(new Keyword("text"))
+				.add(new Keyword("channel"))
+				.add(new StringInput("channel_name"))
 				.build();
 	}
 
 	@Override
-	public Mono<Void> execute(Bot bot) {
+	public Mono<Void> execute(MessageCreateEvent event) {
 		return null;
 	}
 	
@@ -51,15 +51,15 @@ class ExampleInstruction2 implements Instruction {
 	@Override
 	public Grammar getGrammar() {
 		return Grammar.builder()
-				.append(new Keyword("create"))
-				.append(new Keyword("voice"))
-				.append(new Keyword("channel"))
-				.append(new StringInput("channel_name"))
+				.add(new Keyword("create"))
+				.add(new Keyword("voice"))
+				.add(new Keyword("channel"))
+				.add(new StringInput("channel_name"))
 				.build();
 	}
 
 	@Override
-	public Mono<Void> execute(Bot bot) {
+	public Mono<Void> execute(MessageCreateEvent event) {
 		return null;
 	}
 	

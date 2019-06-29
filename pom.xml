@@ -67,6 +67,10 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M3</version>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -93,7 +97,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
+			<artifactId>junit-jupiter-engine</artifactId>
 			<version>5.4.2</version>
 			<scope>test</scope>
 		</dependency>
