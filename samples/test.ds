@@ -35,5 +35,5 @@ configure permissions for @everyone
 configure permissions for Moderator
 | on announcements allow send_messages
 | on mod-chat allow view_channel
-| on Mods allow speak
+| on Mods allow connect
 | default manage_messages priority_speaker kick_members ban_members mute_members deafen_members move_members manage_nicknames
