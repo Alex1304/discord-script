@@ -73,9 +73,10 @@ public class ConfigurePermissionsInstruction implements Instruction {
 	public Mono<Void> execute(MessageCreateEvent event) {
 		var roleId = new AtomicReference<Snowflake>();
 		return DiscordUtils.getRoleByName(event, role)
+				.switchIfEmpty(Mono.error(new RuntimeException("No role found with name '" + role + "'.")))
 				.doOnNext(role -> roleId.set(role.getId()))
 				.flatMap(role -> role.edit(spec -> spec.setPermissions(PermissionSet.of(defaultPerms.toArray(Permission[]::new)))))
-				.and(Flux.merge(Flux.fromIterable(allowedOverwrites.keySet()), Flux.fromIterable(deniedOverwrites.keySet())
+				.and(Flux.defer(() -> Flux.merge(Flux.fromIterable(allowedOverwrites.keySet()), Flux.fromIterable(deniedOverwrites.keySet()))
 						.distinct()
 						.flatMap(name -> DiscordUtils.getTextChannelByName(event, name)
 								.cast(GuildChannel.class)
